@@ -121,6 +121,16 @@ install -m 600 -o root -g root \
   "$LIVE_DIR/server/.env" \
   "$STAGING_DIR/server/.env"
 
+google_client_id="$(sed -n 's/^GOOGLE_CLIENT_ID=//p' "$STAGING_DIR/server/.env" | tail -n 1)"
+
+if [[ -n "$google_client_id" ]]; then
+  export VITE_GOOGLE_CLIENT_ID="$google_client_id"
+  log "Google Sign-In client configuration will be included in the React build."
+else
+  unset VITE_GOOGLE_CLIENT_ID
+  log "Google Sign-In client configuration is absent; building without Google Sign-In."
+fi
+
 log "Installing production server dependencies."
 npm --prefix "$STAGING_DIR/server" ci --omit=dev
 
